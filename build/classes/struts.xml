@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<!-- <constant name="struts.multipart.saveDir" value="/tmp"></constant> -->
+	<package name="sms" namespace="/" extends="struts-default">
+		<action name="login_*" class="loginAction" method="{1}">
+			<result name="admin">
+				/admin/admin_main.jsp
+			</result>
+			<result name="student">
+				/student/student_main.jsp
+			</result>
+			<result name="teacher">
+				/teacher/teacher_main.jsp
+			</result>
+			<result name="error">
+				/login.jsp
+			</result>
+			<result name="logout" type="redirect">
+				/login.jsp
+			</result>
+			<allowed-methods>login,check,modifyPassword,logout</allowed-methods>
+		</action>
+		<action name="major_*" class="majorAction" method="{1}">
+			<allowed-methods>getDepart,getMajor,addClass,getClazz</allowed-methods>
+		</action>
+		<action name="student_*" class="studentAction" method="{1}">
+			<allowed-methods>add,list,update,delete,getStudentMessage,updateVoucher</allowed-methods>
+		</action>
+		<action name="teacher_*" class="teacherAction" method="{1}">
+			<allowed-methods>add,list,update,delete,getTeacherOfDepart,getTeacherMessage,updateVoucher</allowed-methods>
+		</action>
+		<action name="course_*" class="courseAction" method="{1}">
+			<allowed-methods>add,update,list,delete,getCourseList</allowed-methods>
+		</action>
+		<action name="semester_*" class="semesterAction" method="{1}">
+			<allowed-methods>list</allowed-methods>
+		</action>
+		<action name="teaching_*" class="teachingAction" method="{1}">
+			<allowed-methods>list,add,update,delete,getTeachingDetail</allowed-methods>
+		</action>
+		<action name="score_*" class="scoreAction" method="{1}">
+			<allowed-methods>list,update</allowed-methods>
+		</action>
+		<action name="upload_*" class="uploadAction" method="{1}">
+			<result name="excel" type="stream">
+				<param name="contentType">application/vnd.ms-excel</param>    <!-- 注意这里的ContentType -->
+				<param name="inputName">exportFile</param>                   <!-- 这里需要和Action里的变量名一致 -->
+				<param name="contentDisposition">filename="score.xls"</param> <!-- 下载文件的名字 -->
+				<param name="bufferSize">10240</param>  <!-- 下载文件的大小 10485760=10M -->
+			</result>
+			<allowed-methods>importStudent,importTeacher,exportScore</allowed-methods>
+
+		</action>
+	</package>
+
+</struts>
+
+

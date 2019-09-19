@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.CourseDao">
+    <resultMap id="course" type="Course">
+        <result property="id" column="id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="credit" column="credit"/>
+        <result property="courseTime" column="course_time"/>
+        <result property="type" column="type"/>
+    </resultMap>
+	<insert id="addCourse" parameterType="Course">
+	    insert into course(course_name,credit,course_time,type) 
+	    values(#{courseName},#{credit},#{courseTime},#{type});
+	</insert>
+	<update id="updateCourse" parameterType="Course">
+	    update course set course_name=#{courseName},credit=#{credit},
+	    				  course_time=#{courseTime},type=#{type}
+	    			  where id=#{id};
+	</update>
+	<delete id="deleteCourse" parameterType="INTEGER">
+	    delete from course where id = #{id};
+	</delete>
+	<select id="getCourseList" resultMap="course" parameterType="CourseSearchBean">
+	    select id,course_name, credit,course_time,type from course 
+	    <where>
+	        <if test="name!=null and name!=''">
+	            course_name like concat(concat('%',#{name}),'%')
+	        </if>
+	    </where>
+	    limit #{start},#{rows};
+	</select>
+	<select id="getCourseListSize" resultType="INTEGER" parameterType="CourseSearchBean">
+	    select count(id) from course
+	     <where>
+	        <if test="name!=null and name!=''">
+	            course_name like concat(concat('%',#{name}),'%')
+	        </if>
+	    </where>;
+	</select>
+	<select id="getCourseList1" resultType="Course">
+	    select id,course_name as courseName from course ;
+	</select>
+</mapper>
+

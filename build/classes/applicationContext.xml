@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context  
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+    http://www.springframework.org/schema/aop
+     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+	<context:property-placeholder location="classpath:db.properties"/>      
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="url" value="${url}"/>
+		<property name="driverClassName" value="${driver}"/>
+		<property name="username" value="${name}"/>
+		<property name="password" value="${password}"/>
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="loginMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.LoginDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="validateCodeUtil" class="com.beacon.sms.utils.ValidateCodeUtil" />
+
+	<bean id="loginService" class="com.beacon.sms.service.LoginServiceImpl">
+		<property name="loginDao" ref="loginMapper" />
+		<property name="validateCodeUtil" ref="validateCodeUtil" />
+	</bean>
+
+	<bean id="majorMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.MajorDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="dateUtil" class="com.beacon.sms.utils.DateUtil" />
+	<bean id="stringUtil" class="com.beacon.sms.utils.StringUtil" />
+	<bean id="majorService" class="com.beacon.sms.service.MajorServiceImpl">
+		<property name="majorDao" ref="majorMapper" />
+		<property name="dateUtil" ref="dateUtil" />
+		<property name="stringUtil" ref="stringUtil" />
+	</bean>
+	<bean id="jsonUtil" class="com.beacon.sms.utils.JsonUtil" />
+	<bean id="majorAction" class="com.beacon.sms.action.MajorAction">
+		<property name="majorService" ref="majorService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="studentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.StudentDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="studentService" class="com.beacon.sms.service.StudentServiceImpl">
+		<property name="studentDao" ref="studentMapper" />
+		<property name="majorDao" ref="majorMapper" />
+		<property name="stringUtil" ref="stringUtil" />
+		<property name="loginDao" ref="loginMapper" />
+	</bean>
+	<bean id="studentAction" class="com.beacon.sms.action.StudentAction">
+		<property name="studentService" ref="studentService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="teacherMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.TeacherDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="teacherService" class="com.beacon.sms.service.TeacherServiceImpl">
+		<property name="teacherDao" ref="teacherMapper" />
+		<property name="dateUtil" ref="dateUtil" />
+		<property name="stringUtil" ref="stringUtil" />
+		<property name="loginDao" ref="loginMapper" />
+	</bean>
+	<bean id="teacherAction" class="com.beacon.sms.action.TeacherAction">
+		<property name="teacherService" ref="teacherService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="courseMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.CourseDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="courseService" class="com.beacon.sms.service.CourseServiceImpl">
+		<property name="courseDao" ref="courseMapper" />
+	</bean>
+	<bean id="courseAction" class="com.beacon.sms.action.CourseAction">
+		<property name="courseService" ref="courseService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="semesterMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.SemesterDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="semesterService" class="com.beacon.sms.service.SemesterServiceImpl">
+		<property name="semesterDao" ref="semesterMapper" />
+	</bean>
+	<bean id="semesterAction" class="com.beacon.sms.action.SemesterAction">
+		<property name="semesterService" ref="semesterService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="teachingMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.TeachingDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="scoreMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.beacon.sms.dao.ScoreDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="teachingService" class="com.beacon.sms.service.TeachingServiceImpl">
+		<property name="teachingDao" ref="teachingMapper" />
+		<property name="studentDao" ref="studentMapper" />
+		<property name="scoreDao" ref="scoreMapper" />
+	</bean>
+	<bean id="teachingAction" class="com.beacon.sms.action.TeachingAction">
+		<property name="teachingService" ref="teachingService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+
+
+	<bean id="scoreService" class="com.beacon.sms.service.ScoreServiceImpl">
+		<property name="scoreDao" ref="scoreMapper" />
+	</bean>
+	<bean id="scoreAction" class="com.beacon.sms.action.ScoreAction">
+		<property name="scoreService" ref="scoreService" />
+		<property name="jsonUtil" ref="jsonUtil" />
+	</bean>
+	<bean id="excelUtil" class="com.beacon.sms.utils.ExcelUtil" />
+	<bean id="uploadAction" class="com.beacon.sms.action.UpLoadAction">
+		<property name="excelUtil" ref="excelUtil" />
+		<property name="studentService" ref="studentService" />
+		<property name="teacherService" ref="teacherService" />
+		<property name="scoreService" ref="scoreService" />
+	</bean>
+	<bean id="loginAction" class="com.beacon.sms.action.LoginAction">
+		<property name="loginService" ref="loginService" />
+		<property name="teacherService" ref="teacherService" />
+		<property name="studentService" ref="studentService" />
+		<property name="scoreAction" ref="scoreAction" />
+		<property name="upLoadAction" ref="uploadAction" />
+	</bean>
+	
+	<context:component-scan base-package="com.beacon.sms.service"></context:component-scan>
+	<!-- 添加事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	    <property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	    <tx:attributes>
+	        <tx:method name="add*" propagation="REQUIRED"/>
+	        <tx:method name="insert*" propagation="REQUIRED"/>
+	        <tx:method name="update*" propagation="REQUIRED"/>
+	        <tx:method name="delete*" propagation="REQUIRED"/>
+	        <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+	         <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+	          <tx:method name="is*" propagation="SUPPORTS" read-only="true"/>
+	    </tx:attributes>
+	</tx:advice>
+	<aop:config>
+	    <aop:pointcut expression="execution(* com.beacon.sms.service.*.*(..))" id="pc"/>
+	    <aop:advisor advice-ref="txAdvice" pointcut-ref="pc"/>
+	</aop:config>
+</beans>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.LoginDao">
+	<select id="getPassword" resultType="String" parameterType="String">
+	   select password from admin where account=#{userName} 
+	</select>
+	<select id="getAdmin" resultType="Admin" >
+	    select account as userName,password,power from admin where account=#{arg0} and password=#{arg1};
+	</select>
+	<insert id="addAdmin" parameterType="Admin">
+	    insert into admin(account,password,power) values(#{userName},#{password},#{power});
+	</insert>
+	<delete id="deleteAdmin" parameterType="STRING">
+	    delete from admin where account=#{userName};
+	</delete>
+	<update id="updatePassword" >
+	    update admin set password=#{arg1} where account=#{arg0};
+	</update>
+</mapper>
+

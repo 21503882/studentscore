@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.StudentDao">
+	<resultMap id="student" type="Student">
+		<result property="id" column="id" />
+		<result property="studentNo" column="student_no" />
+		<result property="studentName" column="student_name" />
+		<result property="sex" column="sex" />
+		<result property="birthday" column="birthday" />
+		<result property="origin" column="origin" />
+		<result property="cellphone" column="cellphone" />
+		<result property="idCard" column="idcard" />
+		<result property="status" column="status" />
+		<result property="politics" column="politics" />
+		<result property="voucher" column="voucher" />
+		<association property="address" javaType="Address">
+			<result property="address" column="address" />
+			<result property="province" column="province" />
+			<result property="city" column="city" />
+			<result property="county" column="county" />
+			<result property="detailedAddress" column="detailed_address" />
+		</association>
+		<association property="class1" javaType="Class">
+			<result property="id" column="class_id" />
+			<result property="className" column="class_name" />
+			<association property="major" javaType="Major">
+				<result property="id" column="major_id" />
+				<association property="department" javaType="Department">
+					<result property="id" column="department_id" />
+				</association>
+			</association>
+		</association>
+	</resultMap>
+	<insert id="add" parameterType="Student">
+		insert into student
+		(student_name,address,sex,birthday,origin,cellphone,
+		idcard,status,politics,class_id,voucher,student_no,
+		province,city,county,detailed_address)
+		values(#{studentName},#{address.address}
+		,#{sex},#{birthday},#{origin},#{cellphone},
+		#{idCard},#{status},#{politics},#{class1.id},
+		#{voucher},#{studentNo},#{address.province},#{address.city},#{address.county},#{address.detailedAddress});
+	</insert>
+	<update id="setStudentNo">
+		update student set student_no=#{arg1} where id=#{arg0};
+	</update>
+	<select id="getStudentList" resultMap="student">
+		select s.id ,student_no ,student_name,
+		address,sex,birthday,origin,cellphone,
+		idCard,s.status ,politics,c.class_name,province,
+		city,county,detailed_address,s.class_id,c.major_id,m.department_id
+		from student as s ,class as c,major as m,department as d
+		where s.class_id=c.id and c.major_id=m.id and m.department_id=d.id
+		limit #{arg0},#{arg1} ;
+	</select>
+	<select id="getStudentList1" resultMap="student" parameterType="StudentSearchBean">
+		select s.id ,student_no ,student_name,
+		address,sex,birthday,origin,cellphone,
+		idCard,s.status ,politics,c.class_name,province,
+		city,county,detailed_address,s.class_id,c.major_id,m.department_id
+		from student as s ,class as c,major as m,department as d
+		where s.class_id=c.id and c.major_id=m.id and m.department_id=d.id
+		<if test="studentNo!=null and studentNo!=''">
+			and s.student_no=#{studentNo}
+		</if>
+		<if test="studentName!=null and studentName!=''">
+			and s.student_name=#{studentName}
+		</if>
+		<if test="sex!=null and sex!=''">
+			and s.sex=#{sex}
+		</if>
+
+		limit #{start},#{rows} ;
+	</select>
+	<select id="getStudentListSize" resultType="INTEGER"
+		parameterType="StudentSearchBean">
+		select count(id) from student
+		<where>
+			<if test="studentNo!=null and studentNo!=''">
+				student_no=#{studentNo}
+			</if>
+			<if test="studentName!=null and studentName!=''">
+				and student_name=#{studentName}
+			</if>
+			<if test="sex!=null and sex!=''">
+				and sex=#{sex}
+			</if>
+		</where>
+		;
+	</select>
+	<update id="updateStudent" parameterType="Student">
+		update student set student_name=#{studentName},sex=#{sex},
+		province=#{address.province},city=#{address.city},county=#{address.county},
+		detailed_address=#{address.detailedAddress},address=#{address.address},
+		birthday=#{birthday},origin=#{origin},cellphone=#{cellphone},
+		idcard=#{idCard},politics=#{politics},class_id=#{class1.id}
+		where id=#{id}
+	</update>
+	<select id="getClassId" parameterType="INTEGER" resultType="INTEGER">
+		select class_id from student where id = #{id};
+	</select>
+	<delete id="deleteStudent" parameterType="INTEGER">
+		delete from student where id = #{studentId};
+	</delete>
+	<select id="getStudentNo" parameterType="INTEGER" resultType="STRING">
+	    select student_no from student where id=#{id};
+	</select>
+	<select id="getStudentByNo" parameterType="STRING" resultType="Student">
+	    select id,student_name as studentName from student where student_no=#{studentNo};
+	</select>
+	<select id="getListOfStudentIdByClassId" parameterType="INTEGER" resultType="INTEGER">
+	    select id from student where class_id=#{classId};
+	</select>
+	<select id="getStudentById" parameterType="INTEGER" resultMap="student">
+	    select student.id as id,student_no,student_name,address,sex,birthday,origin,cellphone,idcard,
+	    		politics,voucher,class_name ,province,city,county,detailed_address from student,class
+	    		where student.class_id=class.id and student.id=#{studentId};
+	</select>
+	<update id="updateVoucher" parameterType="Student">
+	    update student set voucher=#{voucher} where id=#{id};
+	</update>
+</mapper>
+

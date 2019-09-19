@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.TeachingDao">
+    <resultMap id="teaching" type="Teaching">
+        <result property="id" column="id"/>
+        <association property="teacher" javaType="Teacher">
+            <result property="id" column="teacher_id"/>
+            <result property="teacherNo" column="teacher_no"/>
+            <result property="teacherName" column="teacher_name"/>
+            <association property="department" javaType="Department">
+                <result property="id" column="teacher_department_id"/>
+            </association>
+        </association>
+        <association property="class1" javaType="Class">
+            <result property="id" column="class_id"/>
+            <result property="className" column="class_name"/>
+            <result property="classNo" column="class_no"/>
+            <association property="major" javaType="Major">
+                <result property="id" column="major_id"/>
+                <association property="department" javaType="Department">
+                    <result property="id" column="class_department_id"/>
+                </association>
+            </association>
+        </association>
+        <association property="semester" javaType="Semester">
+            <result property="id" column="semester_id"/>
+            <result property="semesterName" column="semester_name"/>
+        </association>
+        <association property="course" javaType="Course">
+            <result property="id" column="course_id"/>
+            <result property="courseName" column="course_name"/>
+            <result property="credit" column="course_credit"/>
+            <result property="courseTime" column="course_time"/>
+            <result property="type" column="course_type"/>
+        </association>
+        
+    </resultMap>
+   	<select id="getTeachingList" resultMap="teaching" parameterType="TeachingSearchBean">
+   	    select 
+   	    	t1.id,teacher_id,class_id,semester_id,course_id,teacher_name,
+   	    	teacher_no,class_no,class_name,s.name as semester_name,
+   	    	t2.department_id as teacher_department_id,
+   	    	course_name,c1.major_id as major_id,m.department_id as class_department_id
+   	    from teaching as t1,teacher as t2,class as c1,semester as s,course as c2,
+   	    	 major as m
+   	    where t1.teacher_id=t2.id and t1.class_id=c1.id and t1.semester_id=s.id
+   	    	  and t1.course_id=c2.id and c1.major_id=m.id
+   	    	  <if test="teacherNo!=null and teacherNo!=''">
+   	    	      and t2.teacher_no like concat(concat('%',#{teacherNo}),'%')
+   	    	  </if>
+   	    	  <if test="teacherName!=null and teacherName!=''">
+   	    	      and t2.teacher_name like concat(concat('%',#{teacherName}),'%')
+   	    	  </if>
+   	    	  <if test="classNo!=null and classNo!=''">
+   	    	      and c1.class_no like concat(concat('%',#{classNo}),'%')
+   	    	  </if>
+   	    	  <if test="className!=null and className!=''">
+   	    	      and c1.class_name like concat(concat('%',#{className}),'%')
+   	    	  </if>
+   	    	  <if test="courseName!=null and courseName!=''">
+   	    	      and c2.course_name like concat(concat('%',#{courseName},'%'))
+   	    	  </if>
+   	    	  <if test="semesterId!=0">
+   	    	      and s.id=#{semesterId}
+   	    	  </if>
+   	    	  limit #{start},#{rows}
+   	    	  ;
+   	    
+   	</select>
+   	<select id="getTeachingListSize" parameterType="TeachingSearchBean" resultType="INTEGER">
+   	    select count(t1.id) 
+   	    from teaching as t1,teacher as t2,class as c1,
+   	    course as c2,semester as s
+   	    where t1.teacher_id=t2.id and t1.class_id=c1.id and t1.semester_id=s.id
+   	    	  and t1.course_id=c2.id 
+      <if test="teacherNo!=null and teacherNo!=''">
+   	    	      and t2.teacher_no like concat(concat('%',#{teacherNo}),'%')
+   	    	  </if>
+   	    	  <if test="teacherName!=null and teacherName!=''">
+   	    	      and t2.teacher_name like concat(concat('%',#{teacherName}),'%')
+   	    	  </if>
+   	    	  <if test="classNo!=null and classNo!=''">
+   	    	      and c1.class_no like concat(concat('%',#{classNo}),'%')
+   	    	  </if>
+   	    	  <if test="className!=null and className!=''">
+   	    	      and c1.class_name like concat(concat('%',#{className}),'%')
+   	    	  </if>
+   	    	  <if test="courseName!=null and courseName!=''">
+   	    	      and c2.course_name like concat(concat('%',#{courseName},'%'))
+   	    	  </if>
+   	    	  <if test="semesterId!=0">
+   	    	      and s.id=#{semesterId}
+   	    	  </if>
+   	    ;
+   	    
+   	</select>
+   	<insert id="addTeaching" parameterType="Teaching" useGeneratedKeys="true" keyProperty="id" >
+   	    insert into
+   	     	teaching(teacher_id,class_id,semester_id,course_id)
+   	    values(#{teacher.id},#{class1.id},#{semester.id},#{course.id});
+   	</insert>
+   	<update id="updateTeaching" parameterType="Teaching">
+   	    update teaching set teacher_id=#{teacher.id},class_id=#{class1.id},
+   	    					semester_id=#{semester.id},course_id=#{course.id}
+   	    				where id=#{id};
+   	</update>
+   	<delete id="deleteTeaching" parameterType="INTEGER">
+   	    delete from teaching where id=#{teachingId};
+   	</delete>
+   	<select id="getTeachingByTeacherId" parameterType="TeachingSearchBean" resultMap="teaching">
+   	    	select s.name as semester_name,course_name,class_name,course_time ,
+   	    			c1.type as course_type,c1.credit as course_credit
+   	    	from teaching as t,semester as s,course as c1,class as c2
+   	    	where t.class_id=c2.id and t.semester_id=s.id and t.course_id=c1.id
+   	    		  and t.teacher_id=#{teacherId}
+   	    		   <if test="semesterId!=0">
+   	    		     and semester_id=#{semesterId}
+   	    		  </if>
+   	    		  limit #{start},#{rows}
+   	    		 
+   	    		  ;
+   	</select>
+   	<select id="getTeachingByTeacherIdSize" parameterType="TeachingSearchBean" resultType="INTEGER">
+   	    select count(id) from teaching where teacher_id=#{teacherId}
+   	        <if test="semesterId!=0">
+		   	    and  semester_id=#{semesterId}
+   	        </if>
+   	    ; 
+   	</select>
+</mapper>
+

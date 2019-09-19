@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.ScoreDao">
+	<resultMap id="score" type="Score">
+		<result property="id" column="id" />
+		<result property="score" column="score" />
+		<result property="flag" column="flag" />
+		<association property="teaching" javaType="Teaching">
+			<association property="semester" javaType="Semester">
+				<result property="semesterName" column="semester_name" />
+			</association>
+			<association property="teacher" javaType="Teacher">
+			    <result property="teacherName" column="teacher_name"/>
+			</association>
+			<association property="course" javaType="Course">
+				<result property="courseName" column="course_name" />
+				<result property="courseTime" column="course_time" />
+				<result property="credit" column="credit" />
+				<result property="type" column="type" />
+			</association>
+		</association>
+		<association property="student" javaType="Student">
+			<result property="studentNo" column="student_no" />
+			<result property="studentName" column="student_name" />
+			<association property="class1" javaType="Class">
+				<result property="className" column="class_name" />
+			</association>
+		</association>
+
+	</resultMap>
+	<insert id="addScore" parameterType="Score">
+		insert into
+		score(student_id,score,flag,teaching_id)
+		values(#{student.id},#{score},#{flag},#{teaching.id});
+	</insert>
+	<select id="getScoreListByTeacherId" resultMap="score"
+		parameterType="ScoreSearchBean">
+		select s1.id ,s3.name as
+		semester_name,student_no,student_name,class_name,
+		course_name,course_time,credit,type,score,flag,teacher_name
+		from score as s1,student as s2,semester as s3,class as c1,
+		course as c2,teaching as t,teacher as t1
+		where t.id=teaching_id and s1.student_id=s2.id and t.semester_id=s3.id and
+		t.course_id=c2.id and t.teacher_id=t1.id
+		and t.class_id=c1.id 
+		<if test="studentId!=0">
+		    and s1.student_id=#{studentId}
+		</if>
+		<if test="teacherId!=0">
+		    and t.teacher_id=#{teacherId}
+		</if>
+		<if test="semesterId!=0">
+			and semester_id=#{semesterId}
+		</if>
+		<if test="className!=null and className!=''">
+			and class_name like concat(concat('%',#{className}),'%')
+		</if>
+		<if test="teacherName!=null and teacherName!=''">
+			and teacher_name like concat(concat('%',#{teacherName}),'%')
+		</if>
+		<if test="courseName!=null and courseName!=''">
+			and course_name like concat(concat('%',#{courseName}),'%')
+		</if>
+		<if test="flag!=0">
+			and flag=#{flag}
+		</if>
+		<choose>
+		    <when test="order==1">
+		        order by score desc
+		    </when>
+		      <when test="order==2">
+		        order by score 
+		    </when>
+		</choose>
+		<if test="page!=0 and rows!=0">
+			limit #{start},#{rows}
+		</if>
+		;
+	</select>
+	<select id="getScoreListSizeByTeacherId" parameterType="ScoreSearchBean"
+		resultType="INTEGER">
+			select count(s1.id)
+		from score as s1,student as s2,semester as s3,class as c1,
+		course as c2,teaching as t,teacher as t1
+		where t.id=teaching_id and s1.student_id=s2.id and t.semester_id=s3.id and
+		t.course_id=c2.id and t.teacher_id=t1.id
+		and t.class_id=c1.id 
+		<if test="studentId!=0">
+		    and s1.student_id=#{studentId}
+		</if>
+		<if test="teacherId!=0">
+		    and t.teacher_id=#{teacherId}
+		</if>
+		<if test="semesterId!=0">
+			and semester_id=#{semesterId}
+		</if>
+		<if test="className!=null and className!=''">
+			and class_name like concat(concat('%',#{className}),'%')
+		</if>
+		<if test="teacherName!=null and teacherName!=''">
+			and teacher_name like concat(concat('%',#{teacherName}),'%')
+		</if>
+		<if test="courseName!=null and courseName!=''">
+			and course_name like concat(concat('%',#{courseName}),'%')
+		</if>
+		<if test="flag!=0">
+			and flag=#{flag}
+		</if>
+	
+		;
+	</select>
+	<update id="updateScore" parameterType="Score">
+		update score set score=#{score},flag=1 where id=#{id};
+	</update>
+	<delete id="deleteScoreByTeachingId" parameterType="INTEGER">
+	    delete from score where teaching_id=#{teachingId};
+	</delete>
+</mapper>
+

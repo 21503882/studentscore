@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.TeacherDao">
+    <resultMap id="teacher" type="Teacher">
+        <result property="id"  column="id"/>
+        <result property="teacherNo"  column="teacher_no"/>
+        <result property="teacherName"  column="teacher_name"/>
+        <result property="cellphone"  column="cellphone"/>
+        <result property="sex"  column="sex"/>
+        <result property="birthday"  column="birthday"/>
+        <result property="education"  column="education"/>
+        <result property="idCard"  column="idcard"/>
+        <result property="voucher" column="voucher"/>
+        <association property="address" javaType="Address">
+            <result property="province" column="province"/>
+            <result property="city" column="city"/>
+            <result property="county" column="county"/>
+            <result property="detailedAddress" column="detailed_address"/>
+            <result property="address" column="address"/>
+        </association>
+        <association property="department" javaType="Department">
+            <result property="id" column="department_id"/>
+            <result property="name" column="department_name"/>
+        </association>
+    </resultMap>
+	<insert id="addTeacher" parameterType="Teacher" useGeneratedKeys="true" keyProperty="id">
+	    insert into teacher(teacher_name,cellphone,sex,birthday,department_id,education,address,idcard,voucher,province,city,county,detailed_address)
+	    values(#{teacherName},#{cellphone},#{sex},#{birthday},#{department.id},#{education},#{address.address},#{idCard},#{voucher},#{address.province},#{address.city},#{address.county},#{address.detailedAddress});
+	</insert>
+
+	<update id="setTeacherNo">
+	    update teacher set teacher_no=#{arg1} where id=#{arg0};
+	</update>
+	<select id="getTeacherList" resultMap="teacher" parameterType="TeacherSearchBean">
+	    select t.id,teacher_no,teacher_name,cellphone,sex,birthday,
+	    		department_id,education,address,idcard,province,city,county,
+	    		county,detailed_address,department_id,d.depart_name as department_name
+	    from teacher as t,department as d
+	    where t.department_id=d.id
+	    <if test="teacherNo!=null and teacherNo!=''">
+	        and teacher_no=#{teacherNo}
+	    </if>
+	     <if test="teacherName!=null and teacherName!=''">
+	        and teacher_name=#{teacherName}
+	    </if>
+	     <if test="sex!=null and sex!=''">
+	        and sex=#{sex}
+	    </if>
+	     <if test="departmentId!=0">
+	        and department_id=#{departmentId}
+	    </if>
+	    
+	    limit #{start},#{rows};
+	</select>
+	<select id="getTeacherListSize" resultType="INTEGER" parameterType="TeacherSearchBean">
+	    select count(id) from teacher
+	    <where>
+		      <if test="teacherNo!=null and teacherNo!=''">
+		         teacher_no=#{teacherNo}
+		    </if>
+		     <if test="teacherName!=null and teacherName!=''">
+		        and teacher_name=#{teacherName}
+		    </if>
+		     <if test="sex!=null and sex!=''">
+		        and sex=#{sex}
+		    </if>
+		     <if test="departmentId!=0">
+		        and department_id=#{departmentId}
+		    </if>
+	    </where>
+	     ;
+	</select>
+	<update id="updateTeacher" parameterType="Teacher">
+	    update teacher set teacher_name=#{teacherName},cellphone=#{cellphone},
+	    					sex=#{sex},birthday=#{birthday},education=#{education},
+	    					idcard=#{idCard},province=#{address.province},city=#{address.city},
+	    					county=#{address.county},detailed_address=#{address.detailedAddress},
+	    					address=#{address.address},department_id=#{department.id} where id=#{id}
+	</update>
+	<delete id="deleteTeacher" parameterType="INTEGER">
+	    delete from teacher where id=#{teacherId};
+	</delete>
+	<select id ="getTeacherNo" parameterType="INTEGER" resultType="STRING">
+	    select teacher_no from teacher where id =#{id};
+	</select>
+	<select id="getTeacherOfDepart" parameterType="INTEGER" resultType="Teacher">
+	    select id,teacher_name as teacherName from teacher where department_id=#{departmentId};
+	</select>
+	<select id="getTeacherById" resultMap="teacher" parameterType="INTEGER">
+	     select teacher.id as id,teacher_no,teacher_name,cellphone,sex,birthday,
+	     		province,city,county,detailed_address,department.depart_name as department_name,
+	     		department_id,education,address,idcard,voucher
+	     from teacher,department 
+	     where teacher.department_id=department.id and  teacher.id=#{teacherId};
+	</select>
+	<update id="updateVoucher" >
+	    update teacher set voucher = #{arg1} where id= #{arg0};
+	</update>
+	<select id="getTeacherByNo" parameterType="STRING" resultType="Teacher">
+	    select id,teacher_name as teacherName from teacher where teacher_no=#{teacherNo};
+	</select>
+</mapper>
+

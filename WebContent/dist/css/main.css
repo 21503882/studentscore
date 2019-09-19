@@ -1,0 +1,39 @@
+.header {
+	height: 68px;
+	font-size: 20px;
+	background: rgb(247,248,248);
+	line-height: 65px;
+}
+
+.left {
+	width: 120px;
+}
+
+.zuo {
+	float: left;
+}
+
+.you {
+	float: right;
+}
+
+.footer {
+	text-align: center;
+}
+
+.left-list {
+	text-align: center;
+}
+
+.left-list-item {
+	margin-top: 3px;
+	height: 30px;
+	font-size: 14px;
+	line-height: 30px;
+	cursor: pointer;
+}
+
+.left-list-item:hover, .left-list-item-selected {
+	background: rgb(251, 236, 136);
+	font-weight: bolder;
+}

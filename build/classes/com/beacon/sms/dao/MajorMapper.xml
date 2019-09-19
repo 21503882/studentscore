@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beacon.sms.dao.MajorDao">
+	<select id="getDepartmentList" resultType="Department">
+	   select id,depart_name as name from department;
+	</select>
+	<select id="getMajorListById" resultType="Major" parameterType="INTEGER">
+	    select id,major_name as name from major where department_id=#{id};
+	</select>
+	<insert id="addClass" parameterType="Class" useGeneratedKeys="true" keyProperty="id">
+	    insert into class(class_name,status,join_time,major_id,student_num) values(#{className},#{status},#{joinTime},#{major.id},#{studentNum});
+	</insert>
+	<select id="getDepartIdByMajorId" parameterType="INTEGER" resultType="INTEGER">
+	   	select department_id from major where id=#{majorId};
+	</select>
+	
+	<update id="setClassNo" >
+	    update class set class_no = #{arg0} where id=#{arg1}
+	</update>
+	<select id="getClazzList" parameterType="INTEGER" resultType="Class">
+	    select id,class_name as className from class where major_id=#{majorId};
+	</select>
+	<update id="addStudentNum" parameterType="INTEGER">
+	    update class set student_num=student_num+1 where id=#{classId};
+	</update>
+	<select id="getClazz" resultType="Class" parameterType="INTEGER">
+	    select student_num as studentNum,class_no as classNo from class where id=#{classId};
+	</select>
+	<update id="reduceStudentNum" parameterType="INTEGER">
+	    update class set student_num=student_num-1 where id=#{classId}
+	</update>
+</mapper>
+

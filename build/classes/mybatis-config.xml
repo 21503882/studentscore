@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+
+	<typeAliases>
+		<package name="com.beacon.sms.bean"></package>
+	</typeAliases>
+	<mappers>
+	    <mapper resource="com/beacon/sms/dao/LoginMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/MajorMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/StudentMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/TeacherMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/CourseMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/SemesterMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/TeachingMapper.xml"/>
+	    <mapper resource="com/beacon/sms/dao/ScoreMapper.xml"/>
+	</mappers>
+</configuration>
